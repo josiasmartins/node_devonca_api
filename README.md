@@ -1,0 +1,1 @@
+npm init = cria as configuracões do arquivo package.json
