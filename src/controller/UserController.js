@@ -11,17 +11,17 @@ class UserController {
         });
 
         await user.save();
-        res.send(user);
+        res.status(201).send(user);
     }
 
     async getAll(req, res) {
         const users = await User.find();
-        return res.send(users);
+        return res.status(200).send(users);
     }
 
     async deleteUser(req, res) {
         const user = await User.findByIdAndDelete(req.params.id);
-        res.send(user);
+        res.status(201).send(user);
     }
 
     async updateUser(req, res) {
@@ -34,7 +34,7 @@ class UserController {
                     new: true // usado para pegar o valor atualizado
                 });
             
-        return res.send(user);
+        return res.status(201).send(user);
     } 
 
 }
