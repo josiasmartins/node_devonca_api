@@ -1,6 +1,6 @@
-const User = require("../domain/entity/User")
+import User from "../domain/entity/User";
 
-class UserController {
+export class UserController {
 
     async createUser(req, res) {
         const user = new User({
@@ -38,5 +38,3 @@ class UserController {
     } 
 
 }
-
-module.exports = UserController;
