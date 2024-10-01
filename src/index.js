@@ -7,10 +7,6 @@ app.use(express.json());
 
 const port = 3000;
 
-mongoose.connect(`mongodb+srv://db_devonca_user:gnaZPfebbVubrcam@cluster0.78rqzrw.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`).catch(err => {
-    console.error("Erro database ", err);
-})
-
 const User = mongoose.model('User', {
     name: String,
     password: String,
@@ -18,8 +14,27 @@ const User = mongoose.model('User', {
     image_profile: String,
 })
 
-app.get('/', (req, res) => {
-    res.send("hello word");
+app.get('/', async (req, res) => {
+    const users = await User.find();
+    res.send(users);
+});
+
+app.delete("/:id", async (req, res) => {
+    const user = await User.findByIdAndDelete(req.params.id);
+    res.send(user);
+});
+
+app.put("/:id", async (req, res) => {
+    const user = await User.findByIdAndUpdate(req.params.id, {
+        name: req.body.name,
+        password: req.body.password,
+        documentNumber: req.body.documentNumber,
+        image_profile: req.body.image_profile
+    }, {
+        new: true
+    });
+
+    return res.send(user);
 })
 
 app.post("/", async (req, res) => {
@@ -35,5 +50,9 @@ app.post("/", async (req, res) => {
 })
 
 app.listen(port, () => {
+    mongoose.connect(`mongodb+srv://db_devonca_user:gnaZPfebbVubrcam@cluster0.78rqzrw.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`).catch(err => {
+        console.error("Erro database ", err);
+    })
+
     console.log(`Example app listener on port ${port}`)
 })
