@@ -31,7 +31,7 @@ class UserController {
                     documentNumber: req.body.documentNumber,
                     image_profile: req.body.image_profile
                 }, {
-                    new: true // usado para sempre pegar o valor atualizado
+                    new: true // usado para pegar o valor atualizado
                 });
             
         return res.send(user);
