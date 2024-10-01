@@ -2,7 +2,7 @@ import express from "express";
 import routes from "./routes";
 import "dotenv/config"
 import DatabaseInit from "./config/Database";
-import { errorHandler } from "./error_handler/ErrorHandler";
+import { errorHandler } from "./middlewares/ErrorHandler";
 
 const port = process.env.PORT || 3000;
 const app = express();

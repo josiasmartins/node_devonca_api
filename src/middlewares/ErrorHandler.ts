@@ -1,6 +1,6 @@
 import { ErrorModel } from "../domain/model/ErrorModel";
 import { NextFunction, Response, Request } from "express";
-import { ApiError } from "./ApiError";
+import { ApiError } from "../error_handler/ApiError";
 
 export function errorHandler(
     err: Error & Partial<ApiError>, 
