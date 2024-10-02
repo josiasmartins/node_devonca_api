@@ -8,16 +8,15 @@ export function errorHandler(
     res: Response, 
     next: NextFunction) {
 
-    if (res.headersSent) {
-        return next(err);
-    }
+    // if (res.headersSent) {
+    //     return next(err);
+    // }
 
     const statusCode = err.statusCode ?? 500;
     const message = err.message ?? "Internal Server Error";
     
-    
     res.status(statusCode);
-    res.json({ name: err.name, message, statusCode });
+    res.json({ name: err.name, message, statusCode, trace: err.stack  });
     
     // if (res.headersSent) {
     //     return next(err);

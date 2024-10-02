@@ -6,8 +6,10 @@
     "configurations": [
         {
             "type": "node",
-            "request": "Launch Program",
-            "preLaunchTask": "tsc: build - tsconfig.json",
+            "request": "launch",
+            "name": "Launch Program",
+            "program": "${workspaceFolder}/dist/src/index.js",
+            "preLaunchTask": "tsc",
             "outFiles": [
                 "${workspaceFolder}/dist/**/*.js"
             ]
