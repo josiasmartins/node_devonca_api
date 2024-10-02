@@ -50,6 +50,14 @@ export class CourseVideoController {
             })
             .run();
     }
+
+    async listAllVideos(req: Request, res: Response, next: NextFunction) {
+        
+        const courseVideos = await CourseVideo.find();
+
+        res.status(200).send(courseVideos);
+
+    }
     
     
 }

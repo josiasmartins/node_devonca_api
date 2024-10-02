@@ -25,5 +25,6 @@ routes.delete("/user/:id", new UserController().deleteUser);
 
 /** COURSE_VIDEO */
 routes.post("/course_video/upload", upload.single('file'), new CourseVideoController().uploadCourse);
+routes.get("/course_video/", new CourseVideoController().listAllVideos)
 
 export default routes;
