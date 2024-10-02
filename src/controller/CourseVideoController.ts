@@ -16,8 +16,13 @@ export class CourseVideoController {
             throw new BadRequestError("No file uploaded");
         }
 
+        if (!req.params.name_file) {
+            throw new BadRequestError("name_file obrigatório")
+        }
+
         const { path: tempPath, originalname } = req.file;
-        const outputPath = `uploads/compressed-${originalname}`;
+        const nameFile = req.params.name_file;
+        const outputPath = `uploads/compressed_${nameFile}`;
 
         console.log(tempPath, originalname, outputPath, " ibag test")
 
