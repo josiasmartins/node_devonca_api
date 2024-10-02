@@ -1,17 +1,27 @@
-const User = require("../domain/entity/User")
+import User from "../domain/entity/User";
+import { BadRequestError } from "../error_handler/BadRequestHandler";
 
-class UserController {
+export class UserController {
 
-    async createUser(req, res) {
-        const user = new User({
-            name: req.body.name,
-            password: req.body.password,
-            documentNumber: req.body.documentNumber,
-            image_profile: req.body.image_profile
-        });
+    async createUser(req, res, next) {
 
-        await user.save();
-        res.status(201).send(user);
+        try {
+
+            const user = new User({
+                name: req.body.name,
+                password: req.body.password,
+                documentNumber: req.body.documentNumber,
+                image_profile: req.body.image_profile
+            });
+    
+            await user.save();
+            res.status(201).send(user);
+
+        } catch (error) {
+            // throw new BadRequestError("Campo invalido");
+            next(error)
+        }
+
     }
 
     async getAll(req, res) {
@@ -38,5 +48,3 @@ class UserController {
     } 
 
 }
-
-module.exports = UserController;
