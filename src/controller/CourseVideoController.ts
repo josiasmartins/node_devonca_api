@@ -11,26 +11,24 @@ ffmpeg.setFfmpegPath(ffmpegPath);
 export class CourseVideoController {
 
     async uploadCourse(req: Request, res: Response, next: NextFunction) {
-
         if (!req.file) {
             throw new BadRequestError("No file uploaded");
         }
 
-        if (!req.params.name_file) {
-            throw new BadRequestError("name_file obrigatório")
+        if (!req.query.name_file) {
+            throw new BadRequestError("name_file is required");
         }
-
+    
         const { path: tempPath, originalname } = req.file;
-        const nameFile = req.params.name_file;
-        const outputPath = `uploads/compressed_${nameFile}`;
-
-        console.log(tempPath, originalname, outputPath, " ibag test")
-
+        const outputPath = `uploads/compressed_${req.query.name_file}.mp4`;
+    
         ffmpeg(tempPath)
             .output(outputPath)
             .videoCodec('libx264')
             .audioCodec('aac')
-            .size('1920x1080')
+            .outputOptions('-preset ultrafast') // Usando a opção de preset diretamente
+            .outputOptions('-threads 8') // Ajustando o número de threads
+            .outputOptions('-crf 20') // Ajustando a qualidade
             .on('end', async () => {
                 const stats = fs.statSync(outputPath);
                 const courseVideo = new CourseVideo({
@@ -38,9 +36,7 @@ export class CourseVideoController {
                     path: outputPath,
                     size: stats.size,
                 });
-
-                console.log(courseVideo, " ibag course")
-
+    
                 await courseVideo.save();
                 fs.unlinkSync(tempPath); // Remove o arquivo temporário
                 res.status(200).json({
@@ -54,4 +50,6 @@ export class CourseVideoController {
             })
             .run();
     }
+    
+    
 }
