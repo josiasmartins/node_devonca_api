@@ -1,20 +1,11 @@
 import { Router } from "express";
 import { UserController } from "./controller/UserController";
 import { CourseVideoController } from "./controller/CourseVideoController";
-import multer from "multer";
 
-// Configura o armazenamento do multer
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'uploads/');
-    },
-    filename: (req, file, cb) => {
-        cb(null, file.originalname); // Mantém o nome original
-    },
-});
+import multer from 'multer';
 
-// Inicializa o multer com a configuração de armazenamento
-const upload = multer({ storage });
+const upload = multer({ storage: multer.memoryStorage() }); // Armazenar na memória
+
 
 const routes = Router();
 
@@ -25,6 +16,8 @@ routes.delete("/user/:id", new UserController().deleteUser);
 
 /** COURSE_VIDEO */
 routes.post("/course_video/upload", upload.single('file'), new CourseVideoController().uploadCourse);
-routes.get("/course_video/", new CourseVideoController().listAllVideos)
+routes.get("/course_video/", new CourseVideoController().listAllVideos);
+routes.get("/course_video/with_buffer", new CourseVideoController().listAllVideosWithBuffer)
+routes.get("/course_video/:id_video", new CourseVideoController().getCourseById);
 
 export default routes;
