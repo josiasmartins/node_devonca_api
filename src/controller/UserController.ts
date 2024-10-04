@@ -6,6 +6,14 @@ export class UserController {
 
     async createUser(req, res, next) {
 
+        const _user = await User.findOne({ 'documentNumber': req.body.documentNumber});
+
+        console.log(_user, " ibag _user")
+
+        if (_user) {
+            next(new BadRequestError("documentNumber já salvo"));
+        }
+
         try {
 
             const user = new User({
@@ -17,7 +25,6 @@ export class UserController {
             });
     
             await user.save();
-
 
             res.status(201).send(new UserResponseDTO(user));
 

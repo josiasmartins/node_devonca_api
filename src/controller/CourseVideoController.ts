@@ -4,6 +4,7 @@ import fs from 'fs';
 import { NextFunction, Request, Response } from 'express';
 import CourseVideo from '../domain/entity/CourseVideo';
 import { BadRequestError } from '../error_handler/BadRequestHandler';
+import mongoose from 'mongoose';
 
 // Configura o caminho do FFmpeg
 ffmpeg.setFfmpegPath(ffmpegPath);
@@ -67,7 +68,6 @@ export class CourseVideoController {
                     });
 
                     console.error(courseVideo, chunk, " ibag test");
-
                     await courseVideo.save();
                 }
 
@@ -91,7 +91,6 @@ export class CourseVideoController {
                     });
 
                     console.error(courseVideo, chunk, " ibag test");
-
                     await courseVideo.save();
                 }
 
@@ -128,14 +127,27 @@ export class CourseVideoController {
     }
 
     async getCourseById(req: Request, res: Response, next: NextFunction): Promise<void> {
-
-        console.log(req.params.id_video, " ibag id_video");
-
-        const courseVideo = await CourseVideo.findById(req.params.id_video);
-        console.log(courseVideo, " ibag courseVideo");
-
-        res.status(200).json(courseVideo);
-
+        try {
+            const videoId = req.params.id_video;
+            console.log(videoId, " ibag id_video");
+    
+            // Verifica se o ID é um ObjectId válido
+            if (!mongoose.isValidObjectId(videoId)) {
+                throw new BadRequestError("Invalid Video ID format");
+            }
+    
+            const courseVideo = await CourseVideo.findById(videoId);
+    
+            if (!courseVideo) {
+                throw new BadRequestError("Video ID does not exist in database");
+            }
+    
+            console.log(courseVideo, " ibag courseVideo");
+            res.status(200).json(courseVideo);
+        } catch (error) {
+            console.error(error);
+            next(error);
+        }
     }
     
 }
