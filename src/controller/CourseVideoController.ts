@@ -151,11 +151,12 @@ export class CourseVideoController {
     async getConcatAll(req, res, next) {
         const { name_file } = req.query;
 
-        if (!name_file) {
-            throw new BadRequestError("O parameter 'name_file' is required");
-        }
-
         try {
+
+            if (!name_file) {
+                throw new BadRequestError("O parameter 'name_file' is required");
+            }
+
             // Cria uma expressão regular para encontrar os arquivos
             const regex = new RegExp(`^${name_file}\\.part\\d+$`);
             const arquivos = await CourseVideo.find({ filename: regex });
@@ -175,16 +176,6 @@ export class CourseVideoController {
 
             // Envia os dados concatenados como resposta
             res.status(200).send(concatenatedData);
-
-            // Após enviar, deleta os arquivos do sistema de arquivos
-            for (const arquivo of arquivos) {
-                const filePath = path.join(__dirname, 'uploads', arquivo.filename); // Altere o caminho conforme necessário
-                fs.unlink(filePath, (err) => {
-                    if (err) {
-                        console.error(`Erro ao deletar o arquivo ${arquivo.filename}:`, err);
-                    }
-                });
-            }
 
         } catch (err) {
             console.error('Erro ao buscar ou concatenar arquivos:', err);
