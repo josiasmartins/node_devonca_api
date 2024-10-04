@@ -6,6 +6,7 @@ import CourseVideo from '../domain/entity/CourseVideo';
 import { BadRequestError } from '../error_handler/BadRequestHandler';
 import mongoose from 'mongoose';
 import path from "path";
+import { NotFoundError } from '../error_handler/NotFoundError';
 
 // Configura o caminho do FFmpeg
 ffmpeg.setFfmpegPath(ffmpegPath);
@@ -147,13 +148,11 @@ export class CourseVideoController {
     }
     
     
-    // Usar a função de flecha para garantir que `this` se refere à instância da classe
-
     async getConcatAll(req, res, next) {
         const { name_file } = req.query;
 
         if (!name_file) {
-            return res.status(400).send('O parâmetro "name_file" é obrigatório.');
+            throw new BadRequestError("O parameter 'name_file' is required");
         }
 
         try {
@@ -162,7 +161,7 @@ export class CourseVideoController {
             const arquivos = await CourseVideo.find({ filename: regex });
 
             if (arquivos.length === 0) {
-                return res.status(404).send('Nenhum arquivo encontrado.');
+                throw new NotFoundError("File is not found");
             }
 
             // Concatena os dados dos arquivos
@@ -189,9 +188,7 @@ export class CourseVideoController {
 
         } catch (err) {
             console.error('Erro ao buscar ou concatenar arquivos:', err);
-            if (!res.headersSent) {
-                res.status(500).send('Erro ao buscar ou concatenar arquivos.');
-            }
+            next(err);
         }
     }
 
