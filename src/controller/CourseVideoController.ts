@@ -51,6 +51,7 @@ export class CourseVideoController {
     
             // Compressão se o vídeo exceder o tamanho máximo
             if (videoBuffer.length > MAX_SIZE) {
+                fs.mkdirSync('uploads')
                 const tempInputPath = `uploads/temp_${originalname}`;
                 const tempOutputPath = `uploads/compressed_${originalname}`;
     
@@ -77,6 +78,8 @@ export class CourseVideoController {
                 // Remove arquivos temporários
                 fs.unlinkSync(tempInputPath);
                 fs.unlinkSync(tempOutputPath);
+                fs.rmdir("uploads", () => {});
+                
             }
     
             // Calcular quantos pedaços criar com base no buffer (comprimido ou original)
