@@ -81,38 +81,40 @@ export class CourseVideoController {
     
             // Calcular quantos pedaços criar com base no buffer (comprimido ou original)
             const numberOfChunks = Math.ceil(compressedBuffer.length / CHUNK_SIZE);
+            const generatedFiles = []; // Array para armazenar os nomes dos arquivos gerados
     
             // Salvar o vídeo em pedaços
             for (let i = 0; i < numberOfChunks; i++) {
                 const chunk = compressedBuffer.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
-                const courseVideo = new CourseVideo({
-                    filename: `${customFileName}.part${i + 1}`, // Usar o nome personalizado
-                    data: chunk,
-                    size: chunk.length,
-                });
+                const filename = `${customFileName}.part${i + 1}`; // Usar o nome personalizado
     
                 // Verifica se o nome do arquivo já existe antes de salvar o chunk
-                const partFileExists = await CourseVideo.findOne({ filename: courseVideo.filename });
+                const partFileExists = await CourseVideo.findOne({ filename: filename });
                 if (partFileExists) {
                     throw new BadRequestError("File name must be unique. A file with this name already exists.");
                 }
     
+                const courseVideo = new CourseVideo({
+                    filename: filename,
+                    data: chunk,
+                    size: chunk.length,
+                });
+    
                 await courseVideo.save();
+                generatedFiles.push(filename); // Adiciona o nome do arquivo gerado ao array
             }
     
             res.status(200).json({
                 message: "Video uploaded and split into chunks successfully",
-                totalChunks: numberOfChunks
+                totalChunks: numberOfChunks,
+                generatedFiles: generatedFiles, // Inclui os nomes dos arquivos gerados na resposta
             });
         } catch (error) {
             console.error(error);
             next(error);
         }
     }
-    
-    
-    
-    
+
     async listAllVideos(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             // Buscando todos os vídeos, mas excluindo o campo 'data'
