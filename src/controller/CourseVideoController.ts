@@ -5,7 +5,6 @@ import { NextFunction, Request, Response } from 'express';
 import CourseVideo from '../domain/entity/CourseVideo';
 import { BadRequestError } from '../error_handler/BadRequestHandler';
 import mongoose from 'mongoose';
-import path from "path";
 import { NotFoundError } from '../error_handler/NotFoundError';
 
 // Configura o caminho do FFmpeg
@@ -79,7 +78,7 @@ export class CourseVideoController {
                 fs.unlinkSync(tempInputPath);
                 fs.unlinkSync(tempOutputPath);
                 fs.rmdir("uploads", () => {});
-                
+
             }
     
             // Calcular quantos pedaços criar com base no buffer (comprimido ou original)
