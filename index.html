@@ -23,6 +23,7 @@
             border-radius: 10px;
             overflow: hidden;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
         }
 
         #loading {
@@ -31,9 +32,48 @@
             font-size: 20px;
             color: #555;
         }
+
+        input[type="text"] {
+            padding: 10px;
+            width: 300px;
+            border: 2px solid #007BFF;
+            border-radius: 5px;
+            margin-right: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: #0056b3;
+            outline: none;
+        }
+
+        button {
+            padding: 10px 15px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .controls {
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
+
+    <div class="controls">
+        <input type="text" id="_path" placeholder="Digite o nome do arquivo">
+        <button onclick="loadVideo()">Exibir Vídeo</button>
+    </div>
 
     <video controls id="videoPlayer">
         <source id="videoSource" type="video/mp4">
@@ -43,11 +83,14 @@
 
     <script>
         async function loadVideo() {
-            // const videoId = "66ffdd7d21964ab245b40326"; // ID da parte do vídeo
+            const _path = document.getElementById("_path").value;
+
+            console.log(_path, " ibag test");
+
             const loadingMessage = document.getElementById('loading');
             loadingMessage.style.display = 'block'; // Exibir a mensagem de carregamento
 
-            const response = await fetch(`http://localhost:3000/course_video/concat?name_file=curso_node_express_mongodb_typescript_introducao3`);
+            const response = await fetch(`http://localhost:3000/course_video/concat?name_file=${_path}`);
 
             loadingMessage.style.display = 'none'; // Ocultar a mensagem de carregamento
 
@@ -64,8 +107,6 @@
                 console.error('Erro ao carregar o vídeo:', response.statusText);
             }
         }
-
-        loadVideo();
     </script>
 
 </body>
