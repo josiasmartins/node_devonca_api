@@ -211,6 +211,36 @@ export class CourseVideoController {
         }
     }
 
+    async deleteAll(req, res: Response, next) {
+
+        const courseVideo = await CourseVideo.deleteMany({});
+        res.status(200);
+
+        res.send(courseVideo);
+
+    }
+
+    async deleteByName(req: Request, res: Response, next: NextFunction) {
+
+        try {
+
+            const name = req.params.delete_by_name;
+            const existsCourseVideo = await CourseVideo.findOne({ filename: `${name}.part1` });
+
+            if (!existsCourseVideo) {
+                throw new NotFoundError("Not found video");
+            }
+
+            const courseVideo = await CourseVideo.deleteMany({ filename: new RegExp(`^${name}\\.part\\d+$`)});
+
+            res.status(200).json(courseVideo);
+
+        } catch (err) {
+            console.log(err);
+            next(err);
+        }
+
+    }
+
       
-    
 }
