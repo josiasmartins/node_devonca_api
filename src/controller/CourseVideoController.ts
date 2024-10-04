@@ -15,13 +15,28 @@ export class CourseVideoController {
     
     async uploadCourse(req, res: Response, next: NextFunction): Promise<void> {
         try {
-
             if (!req.file) {
                 throw new BadRequestError("No file uploaded");
             }
     
             const { originalname } = req.file;
             const customFileName = req.query.name_file || originalname; // Use o nome da query ou o original
+    
+            // Validação do nome do arquivo
+            const isValidFileName = /^[a-zA-Z0-9_]+$/.test(customFileName);
+            if (!isValidFileName) {
+                throw new BadRequestError("Invalid file name. Only letters, numbers, and underscores (_) are allowed.");
+            }
+    
+            if (customFileName.length > 60) {
+                throw new BadRequestError("File name must not exceed 60 characters.");
+            }
+    
+            // Verifica se o nome do arquivo já existe no banco de dados
+            const existingFile = await CourseVideo.findOne({ filename: new RegExp(`^${customFileName}\\.part\\d+$`) });
+            if (existingFile) {
+                throw new BadRequestError("File name must be unique. A file with this name already exists.");
+            }
     
             const { buffer: videoBuffer } = req.file;
     
@@ -76,19 +91,26 @@ export class CourseVideoController {
                     size: chunk.length,
                 });
     
+                // Verifica se o nome do arquivo já existe antes de salvar o chunk
+                const partFileExists = await CourseVideo.findOne({ filename: courseVideo.filename });
+                if (partFileExists) {
+                    throw new BadRequestError("File name must be unique. A file with this name already exists.");
+                }
+    
                 await courseVideo.save();
             }
     
             res.status(200).json({
                 message: "Video uploaded and split into chunks successfully",
-                totalChunks: numberOfChunks,
+                totalChunks: numberOfChunks
             });
         } catch (error) {
             console.error(error);
             next(error);
         }
     }
-     
+    
+    
     
     
     async listAllVideos(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -176,6 +198,8 @@ export class CourseVideoController {
 
             // Envia os dados concatenados como resposta
             res.status(200).send(concatenatedData);
+
+            console.log(`VIDEO_CONCATENACAO : result success`)
 
         } catch (err) {
             console.error('Erro ao buscar ou concatenar arquivos:', err);
