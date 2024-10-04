@@ -43,11 +43,11 @@
 
     <script>
         async function loadVideo() {
-            const videoId = "66ffdd7d21964ab245b40326"; // ID da parte do vídeo
+            // const videoId = "66ffdd7d21964ab245b40326"; // ID da parte do vídeo
             const loadingMessage = document.getElementById('loading');
             loadingMessage.style.display = 'block'; // Exibir a mensagem de carregamento
 
-            const response = await fetch(`http://localhost:3000/course_video/${videoId}`);
+            const response = await fetch(`http://localhost:3000/course_video/concat?name_file=curso_node_express_mongodb_typescript_introducao3`);
 
             loadingMessage.style.display = 'none'; // Ocultar a mensagem de carregamento
 

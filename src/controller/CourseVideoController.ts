@@ -5,6 +5,7 @@ import { NextFunction, Request, Response } from 'express';
 import CourseVideo from '../domain/entity/CourseVideo';
 import { BadRequestError } from '../error_handler/BadRequestHandler';
 import mongoose from 'mongoose';
+import path from "path";
 
 // Configura o caminho do FFmpeg
 ffmpeg.setFfmpegPath(ffmpegPath);
@@ -145,26 +146,47 @@ export class CourseVideoController {
         }
     }
     
-
+    
+    // Usar a função de flecha para garantir que `this` se refere à instância da classe
     async getConcatAll(req, res, next) {
         const { name_file } = req.query;
 
         if (!name_file) {
-          return res.status(400).send('O parâmetro "prefix" é obrigatório.');
+            return res.status(400).send('O parâmetro "name_file" é obrigatório.');
         }
-      
+
         try {
-          // Cria uma expressão regular que busca por qualquer filename começando com o prefixo e terminando com .part
-          const regex = new RegExp(`^${name_file}\\.part\\d+$`);
-          const arquivos = await CourseVideo.find({ filename: regex }).select("-data");
-          console.log(`REGEX ${regex}- ${arquivos}`)
-          res.json(arquivos);
+            // Cria uma expressão regular que busca por qualquer filename começando com o prefixo e terminando com .part
+            const regex = new RegExp(`^${name_file}\\.part\\d+$`);
+            const arquivos = await CourseVideo.find({ filename: regex }).select('data');
+
+            if (arquivos.length === 0) {
+                return res.status(404).send('Nenhum arquivo encontrado.');
+            }
+
+            // Concatena os dados dos arquivos diretamente aqui
+            const concatenatedData = Buffer.concat(arquivos.map(arquivo => arquivo.data));
+
+            // Define o nome do arquivo de saída
+            const outputFileName = `${name_file}.concatenated.mp4`; // Altere a extensão conforme necessário
+
+            // Salva o arquivo concatenado no sistema de arquivos
+            const outputPath = path.join(__dirname, outputFileName);
+            fs.writeFileSync(outputPath, concatenatedData);
+
+            // Retorna o caminho do arquivo concatenado
+            res.download(outputPath, outputFileName, (err) => {
+                if (err) {
+                    console.error('Erro ao enviar o arquivo:', err);
+                    res.status(500).send('Erro ao enviar o arquivo.');
+                }
+                // Opcional: Remover o arquivo após o download
+                fs.unlinkSync(outputPath);
+            });
         } catch (err) {
-          console.error('Erro ao buscar arquivos:', err);
-          res.status(500).send(err);
+            console.error('Erro ao buscar ou concatenar arquivos:', err);
+            res.status(500).send('Erro ao buscar ou concatenar arquivos.');
         }
     }
-    
-        
     
 }
