@@ -148,41 +148,53 @@ export class CourseVideoController {
     
     
     // Usar a função de flecha para garantir que `this` se refere à instância da classe
+
     async getConcatAll(req, res, next) {
         const { name_file } = req.query;
-    
+
         if (!name_file) {
             return res.status(400).send('O parâmetro "name_file" é obrigatório.');
         }
-    
+
         try {
             // Cria uma expressão regular para encontrar os arquivos
             const regex = new RegExp(`^${name_file}\\.part\\d+$`);
             const arquivos = await CourseVideo.find({ filename: regex });
-    
+
             if (arquivos.length === 0) {
                 return res.status(404).send('Nenhum arquivo encontrado.');
             }
-    
+
             // Concatena os dados dos arquivos
             const concatenatedData = Buffer.concat(arquivos.map(arquivo => arquivo.data));
-    
+
             // Define o cabeçalho para streaming de vídeo
             res.set({
                 'Content-Type': 'video/mp4',
                 'Content-Length': concatenatedData.length,
             });
-    
+
             // Envia os dados concatenados como resposta
             res.status(200).send(concatenatedData);
-    
+
+            // Após enviar, deleta os arquivos do sistema de arquivos
+            for (const arquivo of arquivos) {
+                const filePath = path.join(__dirname, 'uploads', arquivo.filename); // Altere o caminho conforme necessário
+                fs.unlink(filePath, (err) => {
+                    if (err) {
+                        console.error(`Erro ao deletar o arquivo ${arquivo.filename}:`, err);
+                    }
+                });
+            }
+
         } catch (err) {
             console.error('Erro ao buscar ou concatenar arquivos:', err);
             if (!res.headersSent) {
                 res.status(500).send('Erro ao buscar ou concatenar arquivos.');
             }
         }
-    }    
+    }
+
       
     
 }
