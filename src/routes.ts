@@ -18,6 +18,7 @@ routes.delete("/user/:id", new UserController().deleteUser);
 routes.post("/course_video/upload", upload.single('file'), new CourseVideoController().uploadCourse);
 routes.get("/course_video/", new CourseVideoController().listAllVideos);
 routes.get("/course_video/with_buffer", new CourseVideoController().listAllVideosWithBuffer)
-routes.get("/course_video/:id_video", new CourseVideoController().getCourseById);
+routes.get("/course_video/id/:id_video", new CourseVideoController().getCourseById);
+routes.get("/course_video/concat", new CourseVideoController().getConcatAll);
 
 export default routes;

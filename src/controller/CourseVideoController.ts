@@ -13,38 +13,40 @@ export class CourseVideoController {
     
     async uploadCourse(req, res: Response, next: NextFunction): Promise<void> {
         try {
+
             if (!req.file) {
                 throw new BadRequestError("No file uploaded");
             }
-
-            if (!req.query.name_file) {
-                throw new BadRequestError("name_file is required");
-            }
-
-            const { buffer: videoBuffer, originalname } = req.file;
-
+    
+            const { originalname } = req.file;
+            const customFileName = req.query.name_file || originalname; // Use o nome da query ou o original
+    
+            const { buffer: videoBuffer } = req.file;
+    
             if (!videoBuffer) {
                 throw new BadRequestError("File buffer is undefined");
             }
-
+    
             const MAX_SIZE = 16 * 1024 * 1024; // 16 MB
             const CHUNK_SIZE = 12 * 1024 * 1024; // 12 MB
-
-            // Comprimir se o vídeo exceder o tamanho máximo
+    
+            let compressedBuffer = videoBuffer;
+    
+            // Compressão se o vídeo exceder o tamanho máximo
             if (videoBuffer.length > MAX_SIZE) {
                 const tempInputPath = `uploads/temp_${originalname}`;
                 const tempOutputPath = `uploads/compressed_${originalname}`;
-
+    
                 fs.writeFileSync(tempInputPath, videoBuffer);
-
+    
                 // Compressão do vídeo
                 await new Promise<void>((resolve, reject) => {
                     ffmpeg(tempInputPath)
                         .output(tempOutputPath)
                         .videoCodec('libx264')
                         .audioCodec('aac')
-                        .outputOptions('-preset ultrafast') // Configuração para compressão rápida
-                        .outputOptions('-crf 28') // Ajuste do CRF para qualidade
+                        .outputOptions('-preset veryfast') // Preset ajustado para velocidade
+                        .outputOptions('-crf 23') // Melhor qualidade (pode ser ajustado)
                         .on('end', () => resolve())
                         .on('error', (error) => {
                             console.error(error);
@@ -52,59 +54,41 @@ export class CourseVideoController {
                         })
                         .run();
                 });
-
-                const compressedBuffer = fs.readFileSync(tempOutputPath);
-                
-                // Calcular quantos pedaços criar com base no tamanho comprimido
-                const numberOfChunks = Math.ceil(compressedBuffer.length / CHUNK_SIZE);
-
-                // Salvar o vídeo em pedaços
-                for (let i = 0; i < numberOfChunks; i++) {
-                    const chunk = compressedBuffer.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
-                    const courseVideo = new CourseVideo({
-                        filename: `${originalname}.part${i + 1}`,
-                        data: chunk,
-                        size: chunk.length,
-                    });
-
-                    console.error(courseVideo, chunk, " ibag test");
-                    await courseVideo.save();
-                }
-
+    
+                compressedBuffer = fs.readFileSync(tempOutputPath);
+    
                 // Remove arquivos temporários
                 fs.unlinkSync(tempInputPath);
                 fs.unlinkSync(tempOutputPath);
-                res.status(200).json({
-                    message: "Video uploaded and split into chunks successfully",
-                    totalChunks: numberOfChunks,
-                });
-            } else {
-                // Se o vídeo já estiver dentro do limite
-                const numberOfChunks = Math.ceil(videoBuffer.length / CHUNK_SIZE);
-
-                for (let i = 0; i < numberOfChunks; i++) {
-                    const chunk = videoBuffer.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
-                    const courseVideo = new CourseVideo({
-                        filename: `${originalname}.part${i + 1}`,
-                        data: chunk,
-                        size: chunk.length,
-                    });
-
-                    console.error(courseVideo, chunk, " ibag test");
-                    await courseVideo.save();
-                }
-
-                res.status(200).json({
-                    message: "Video uploaded successfully",
-                    totalChunks: numberOfChunks,
-                });
             }
+    
+            // Calcular quantos pedaços criar com base no buffer (comprimido ou original)
+            const numberOfChunks = Math.ceil(compressedBuffer.length / CHUNK_SIZE);
+    
+            // Salvar o vídeo em pedaços
+            for (let i = 0; i < numberOfChunks; i++) {
+                const chunk = compressedBuffer.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
+                const courseVideo = new CourseVideo({
+                    filename: `${customFileName}.part${i + 1}`, // Usar o nome personalizado
+                    data: chunk,
+                    size: chunk.length,
+                });
+    
+                await courseVideo.save();
+            }
+    
+            res.status(200).json({
+                message: "Video uploaded and split into chunks successfully",
+                totalChunks: numberOfChunks,
+            });
         } catch (error) {
             console.error(error);
             next(error);
         }
     }
-
+     
+    
+    
     async listAllVideos(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             // Buscando todos os vídeos, mas excluindo o campo 'data'
@@ -161,5 +145,26 @@ export class CourseVideoController {
         }
     }
     
+
+    async getConcatAll(req, res, next) {
+        const { name_file } = req.query;
+
+        if (!name_file) {
+          return res.status(400).send('O parâmetro "prefix" é obrigatório.');
+        }
+      
+        try {
+          // Cria uma expressão regular que busca por qualquer filename começando com o prefixo e terminando com .part
+          const regex = new RegExp(`^${name_file}\\.part\\d+$`);
+          const arquivos = await CourseVideo.find({ filename: regex }).select("-data");
+          console.log(`REGEX ${regex}- ${arquivos}`)
+          res.json(arquivos);
+        } catch (err) {
+          console.error('Erro ao buscar arquivos:', err);
+          res.status(500).send(err);
+        }
+    }
+    
+        
     
 }
