@@ -1,3 +1,4 @@
+import { UserResponseDTO } from "../domain/DTO/UserResponse";
 import User from "../domain/entity/User";
 import { BadRequestError } from "../error_handler/BadRequestHandler";
 
@@ -5,17 +6,27 @@ export class UserController {
 
     async createUser(req, res, next) {
 
+        const _user = await User.findOne({ 'documentNumber': req.body.documentNumber});
+
+        console.log(_user, " ibag _user")
+
+        if (_user) {
+            next(new BadRequestError("documentNumber já salvo"));
+        }
+
         try {
 
             const user = new User({
                 name: req.body.name,
                 password: req.body.password,
                 documentNumber: req.body.documentNumber,
-                image_profile: req.body.image_profile
+                image_profile: req.body.image_profile,
+                birthday: req.body.birthday
             });
     
             await user.save();
-            res.status(201).send(user);
+
+            res.status(201).send(new UserResponseDTO(user));
 
         } catch (error) {
             // throw new BadRequestError("Campo invalido");
@@ -26,7 +37,10 @@ export class UserController {
 
     async getAll(req, res) {
         const users = await User.find();
-        return res.status(200).send(users);
+
+        const usersConvertedToDto = users.map(user => new UserResponseDTO(user))
+
+        return res.status(200).json(usersConvertedToDto);
     }
 
     async deleteUser(req, res) {
