@@ -3,76 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Exibição de Vídeos</title>
+    <title>Player de Vídeo</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
         }
-        video {
-            display: block;
-            margin: 10px 0;
-            max-width: 600px;
+
+        #videoPlayer {
+            width: 80%;
+            max-width: 800px;
+            border: 2px solid #333;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
         }
-        h4 {
-            margin: 5px 0;
+
+        #loading {
+            display: none;
+            margin-top: 20px;
+            font-size: 20px;
+            color: #555;
         }
     </style>
 </head>
 <body>
 
-<h1>Vídeos Carregados</h1>
-<div id="video-container"></div>
+    <video controls id="videoPlayer">
+        <source id="videoSource" type="video/mp4">
+        Seu navegador não suporta o vídeo.
+    </video>
+    <div id="loading">Carregando o vídeo...</div>
 
-<script>
-    let uri = "http://localhost:3000/course_video/66fe8e58a3a09a2810fbe4c6";
-    async function fetchVideos() {
-        try {
-            const response = await fetch(uri); // Substitua pelo endpoint correto
-            if (!response.ok) throw new Error('Erro ao buscar vídeos');
-            
-            const videos = await response.json();
-            return videos;
-        } catch (error) {
-            console.error(error);
-            return [];
-        }
-    }
+    <script>
+        async function loadVideo() {
+            const videoId = "66ffdd7d21964ab245b40326"; // ID da parte do vídeo
+            const loadingMessage = document.getElementById('loading');
+            loadingMessage.style.display = 'block'; // Exibir a mensagem de carregamento
 
-    async function fetchAndDisplayVideos() {
-        const videos = await fetchVideos();
-        const videoMap = {};
+            const response = await fetch(`http://localhost:3000/course_video/${videoId}`);
 
-        // Agrupar vídeos por nome (ou outro critério)
-        [videos].forEach(video => {
-            const name = video.filename.replace(/\.part\d+$/, ''); // Remove o número da parte
-            if (!videoMap[name]) {
-                videoMap[name] = [];
+            loadingMessage.style.display = 'none'; // Ocultar a mensagem de carregamento
+
+            if (response.ok) {
+                const videoBlob = await response.blob();
+                const videoUrl = URL.createObjectURL(videoBlob);
+                const videoElement = document.getElementById('videoPlayer');
+                const sourceElement = document.getElementById('videoSource');
+
+                sourceElement.src = videoUrl;
+                videoElement.load();
+                videoElement.play();
+            } else {
+                console.error('Erro ao carregar o vídeo:', response.statusText);
             }
-            videoMap[name].push(video.data); // Adiciona os dados da parte
-        });
-
-        const videoContainer = document.getElementById('video-container');
-
-        // Criar um elemento de vídeo para cada vídeo completo
-        for (const [name, parts] of Object.entries(videoMap)) {
-            const completeVideoData = parts.join(''); // Concatena os dados base64
-
-            const videoElement = document.createElement('video');
-            videoElement.src = `data:video/mp4;base64,${completeVideoData}`; // Usando o dado em base64
-            videoElement.controls = true;
-
-            const titleElement = document.createElement('h4');
-            titleElement.innerText = name;
-
-            videoContainer.appendChild(titleElement);
-            videoContainer.appendChild(videoElement);
         }
-    }
 
-    // Chame a função para exibir os vídeos quando a página carregar
-    fetchAndDisplayVideos();
-</script>
+        loadVideo();
+    </script>
 
 </body>
 </html>

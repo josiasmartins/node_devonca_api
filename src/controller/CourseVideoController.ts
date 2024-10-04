@@ -143,11 +143,23 @@ export class CourseVideoController {
             }
     
             console.log(courseVideo, " ibag courseVideo");
-            res.status(200).json(courseVideo);
+    
+            // Define o cabeçalho Content-Type
+            res.set('Content-Type', 'video/mp4');
+    
+            // Se courseVideo.data for um buffer, você pode enviar diretamente
+            if (Buffer.isBuffer(courseVideo.data)) {
+                // Define o comprimento do conteúdo
+                res.set('Content-Length', courseVideo.data.length.toString());
+                res.status(200).send(courseVideo.data);
+            } else {
+                throw new BadRequestError("Video data is not in the correct format");
+            }
         } catch (error) {
             console.error(error);
             next(error);
         }
     }
+    
     
 }
