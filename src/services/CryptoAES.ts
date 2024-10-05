@@ -14,9 +14,9 @@ export class CryptoAES {
         this.iv = Buffer.from("i_lik_in_the_end"); // Exemplo de 16 bytes
     }
 
-    public encrypt(text: string): string {
+    public encrypt(text: string | number | boolean): string {
         const cipher = crypto.createCipheriv('aes-256-cbc', this.key, this.iv);
-        const encrypted = Buffer.concat([cipher.update(text, 'utf8'), cipher.final()]).toString('base64');
+        const encrypted = Buffer.concat([cipher.update(String(text), 'utf8'), cipher.final()]).toString('base64');
         console.log(encrypted, " ibag encrypted")
         return encrypted;
     }
@@ -28,21 +28,40 @@ export class CryptoAES {
         return decrypted;
     }
 
-    public cryptoData(data: any) {
+    public cryptoAll(data: any) {
+        let encryptedData = {};
 
-        let objeto = {};
-
-        for (let field in data) {
-            const nameField = field;
-            const fieldValue = data[field];
-
-            const encryptedValue = this.encrypt(fieldValue);
-            objeto[field] = encryptedValue;
+        for (let fieldName in data) {
+            const fieldValue = data[fieldName];
+            encryptedData[fieldName] = fieldValue; 
         }
 
-        return objeto;
+        return encryptedData;
 
     }
 
+    public cryptoData(data: any) {
+        // Verifica se o dado é um objeto e não é nulo
+        if (typeof data === 'object' && data !== null) {
+            // Percorre cada chave no objeto
+            for (let key in data) {
+                const fieldValue = data[key];
+                // Verifica se o valor da chave é uma string, um número ou booleano
+                if (typeof fieldValue === 'string' || typeof fieldValue === 'number' || typeof fieldValue === 'boolean') {
+                    // cryptografa o valor
+                    data[key] = this.encrypt(fieldValue);
+                } else {
+                    // Se o valor é um objeto ou array, chama a função recursivamente
+                    this.cryptoData(data[key]);
+                }
+            }
+        }
+    
+        // Retorna o objeto ou array modificado
+        return data;
+    }
+    
+
 
 }
+

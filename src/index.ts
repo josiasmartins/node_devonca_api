@@ -9,7 +9,7 @@ import { CryptoRSA } from "./services/CryptoRSA";
 import { CryptoAES } from "./services/CryptoAES";
 
 const cryptoAES = new CryptoAES();
-console.log(cryptoAES.decrypt(cryptoAES.encrypt("i love jessica")));
+console.log(cryptoAES.decrypt(cryptoAES.encrypt("i like in the end")));
 
 // const cryptoRSA = new CryptoRSA();
 // cryptoRSA.decrypt(cryptoRSA.encrypt("Devonca schools"));
