@@ -1,6 +1,10 @@
 import crypto from "crypto";
 import { key_private } from "../config/ReadKeysConfig";
+import { CryptoEnum } from "./CryptoEnum";
 
+/**
+ * Class for crypto simetric (AES)
+ */
 export class CryptoAES {
 
     private key: Buffer;
@@ -40,7 +44,7 @@ export class CryptoAES {
 
     }
 
-    public cryptoData(data: any) {
+    public cryptoData(data: any, crypto: CryptoEnum) {
         // Verifica se o dado é um objeto e não é nulo
         if (typeof data === 'object' && data !== null) {
             // Percorre cada chave no objeto
@@ -49,10 +53,10 @@ export class CryptoAES {
                 // Verifica se o valor da chave é uma string, um número ou booleano
                 if (typeof fieldValue === 'string' || typeof fieldValue === 'number' || typeof fieldValue === 'boolean') {
                     // cryptografa o valor
-                    data[key] = this.encrypt(fieldValue);
+                    data[key] = crypto === CryptoEnum.ENCRYPT ? this.encrypt(fieldValue)  : this.decrypt(String(fieldValue));
                 } else {
                     // Se o valor é um objeto ou array, chama a função recursivamente
-                    this.cryptoData(data[key]);
+                    this.cryptoData(data[key], crypto);
                 }
             }
         }

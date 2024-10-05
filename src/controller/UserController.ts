@@ -2,6 +2,7 @@ import { UserResponseDTO } from "../domain/DTO/UserResponse";
 import User from "../domain/entity/User";
 import { BadRequestError } from "../error_handler/BadRequestHandler";
 import { CryptoAES } from "../services/CryptoAES";
+import { CryptoEnum } from "../services/CryptoEnum";
 
 const complexObject = {
     user: {
@@ -93,9 +94,10 @@ export class UserController {
                 birthday: req.body.birthday
             });
 
-            const data = new CryptoAES().cryptoData(complexObject);
-
-            console.log(JSON.stringify(data, null, 2))
+            const crypted = new CryptoAES().cryptoData(complexObject, CryptoEnum.ENCRYPT);
+            const decrypted = new CryptoAES().cryptoData(crypted, CryptoEnum.DECRYPT);
+            console.log(JSON.stringify(crypted, null, 2), "  IBAG ENCRYPTED");
+            // console.log(JSON.stringify(decrypted, null, 2), "  IBAG TEST");
     
             await user.save();
 
