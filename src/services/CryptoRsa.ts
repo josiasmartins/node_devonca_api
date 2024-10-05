@@ -37,4 +37,20 @@ export class CryptoRSA {
         return decrypted;
     }
 
+
+    public cryptoData(data: any) {
+
+        let objeto;
+
+        for (let field in data) {
+            const nameField = field;
+            const fieldValue = data[field];
+
+            objeto[field] = this.encrypt(fieldValue);
+        }
+
+        return objeto;
+
+    }
+
 }
