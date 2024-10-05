@@ -15,7 +15,7 @@ import { decrypt, encrypt } from "./services/test";
 // import "./services/test"
 const cryptoRSA = new CryptoRSA();
 // const encryptedValue = cryptoRSA.encrypt("hello word");
-cryptoRSA.decrypt(cryptoRSA.encrypt("jessica valeska"));
+cryptoRSA.decrypt(cryptoRSA.encrypt(null));
 
 const port = process.env.PORT || 3000;
 const app = express();
