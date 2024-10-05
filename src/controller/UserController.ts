@@ -2,6 +2,8 @@ import { UserResponseDTO } from "../domain/DTO/UserResponse";
 import User from "../domain/entity/User";
 import { BadRequestError } from "../error_handler/BadRequestHandler";
 
+import { CryptoRSA } from "../services/CryptoRSA";
+
 export class UserController {
 
     async createUser(req, res, next) {
@@ -16,15 +18,17 @@ export class UserController {
 
         try {
 
-            const user = new User({
+            const encryptedData = new CryptoRSA().cryptoData({
                 name: req.body.name,
                 password: req.body.password,
                 documentNumber: req.body.documentNumber,
                 image_profile: req.body.image_profile,
                 birthday: req.body.birthday
             });
+
+            const user = new User(encryptedData);
     
-            await user.save();
+            // await user.save();
 
             res.status(201).send(new UserResponseDTO(user));
 

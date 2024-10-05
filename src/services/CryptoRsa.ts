@@ -40,13 +40,14 @@ export class CryptoRSA {
 
     public cryptoData(data: any) {
 
-        let objeto;
+        let objeto = {};
 
         for (let field in data) {
             const nameField = field;
             const fieldValue = data[field];
 
-            objeto[field] = this.encrypt(fieldValue);
+            const encryptedValue = this.encrypt(fieldValue);
+            objeto[field] = encryptedValue;
         }
 
         return objeto;

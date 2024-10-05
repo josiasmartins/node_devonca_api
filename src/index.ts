@@ -5,7 +5,7 @@ import express from "express";
 import DatabaseInit from "./config/Database";
 import routes from "./routes";
 import { errorHandler } from "./middlewares/ErrorHandler";
-import { CryptoRSA } from "./services/CryptoRsa";
+import { CryptoRSA } from "./services/CryptoRSA";
 
 const cryptoRSA = new CryptoRSA();
 cryptoRSA.decrypt(cryptoRSA.encrypt("Devonca schools"));
