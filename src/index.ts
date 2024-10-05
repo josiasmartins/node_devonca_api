@@ -8,7 +8,7 @@ import { errorHandler } from "./middlewares/ErrorHandler";
 import { CryptoRSA } from "./services/CryptoRsa";
 
 const cryptoRSA = new CryptoRSA();
-cryptoRSA.decrypt(cryptoRSA.encrypt(null));
+cryptoRSA.decrypt(cryptoRSA.encrypt("Devonca schools"));
 
 const port = process.env.PORT || 3000;
 const app = express();
