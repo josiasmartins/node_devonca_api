@@ -1,6 +1,40 @@
 ## Passos runner projeto
 
+ public cryptoData(data: any): any {
+        if (typeof data !== 'object' || data === null) {
+            // Se não for um objeto ou for nulo, retorna o valor original
+            return data;
+        }
+
+        if (Array.isArray(data)) {
+            // Se for um array, percorre e aplica a criptografia em cada item
+            return data.map(item => this.cryptoData(item));
+        }
+
+        // Para objetos, percorre cada campo
+        const encryptedData: Record<string, any> = {};
+        for (let field in data) {
+            const fieldValue = data[field];
+            // Criptografa o valor se for string, número ou booleano
+            if (typeof fieldValue === 'string' || typeof fieldValue === 'number' || typeof fieldValue === 'boolean') {
+                encryptedData[field] = this.encrypt(fieldValue.toString());
+            } else {
+                // Se for um objeto ou array, chama recursivamente
+                encryptedData[field] = this.cryptoData(fieldValue);
+            }
+        }
+
+        return encryptedData;
+    }
+
 ## Cryptografia
+
+ssl
+```bash
+openssl genrsa -out keys/private.pem 2048
+openssl rsa -in keys/private.pem -outform PEM -pubout -out keys/public.pem
+```
+
 Estamos usando node-rsa para cryptografia asimetrica;
 
 ## Criacao do projeto
