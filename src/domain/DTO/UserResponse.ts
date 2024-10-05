@@ -1,5 +1,3 @@
-import User  from "../entity/User";
-
 export class UserResponseDTO {
 
     private name: string;

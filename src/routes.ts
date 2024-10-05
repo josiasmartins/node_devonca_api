@@ -20,5 +20,7 @@ routes.get("/course_video/", new CourseVideoController().listAllVideos);
 routes.get("/course_video/with_buffer", new CourseVideoController().listAllVideosWithBuffer)
 routes.get("/course_video/id/:id_video", new CourseVideoController().getCourseById);
 routes.get("/course_video/concat", new CourseVideoController().getConcatAll);
+routes.delete("/course_video/delete_all", new CourseVideoController().deleteAll);
+routes.delete("/course_video/:delete_by_name", new CourseVideoController().deleteByName)
 
 export default routes;
