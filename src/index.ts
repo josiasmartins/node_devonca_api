@@ -3,6 +3,9 @@ import routes from "./routes";
 import "dotenv/config";
 import DatabaseInit from "./config/Database";
 import { errorHandler } from "./middlewares/ErrorHandler";
+import { CryptoRSA } from "./services/CryptoRsa";
+
+new CryptoRSA().encrypt();
 
 const port = process.env.PORT || 3000;
 const app = express();
