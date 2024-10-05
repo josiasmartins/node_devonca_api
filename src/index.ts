@@ -6,9 +6,13 @@ import DatabaseInit from "./config/Database";
 import routes from "./routes";
 import { errorHandler } from "./middlewares/ErrorHandler";
 import { CryptoRSA } from "./services/CryptoRSA";
+import { CryptoAES } from "./services/CryptoAES";
 
-const cryptoRSA = new CryptoRSA();
-cryptoRSA.decrypt(cryptoRSA.encrypt("Devonca schools"));
+const cryptoAES = new CryptoAES();
+console.log(cryptoAES.decrypt(cryptoAES.encrypt("i love jessica")));
+
+// const cryptoRSA = new CryptoRSA();
+// cryptoRSA.decrypt(cryptoRSA.encrypt("Devonca schools"));
 
 const port = process.env.PORT || 3000;
 const app = express();
