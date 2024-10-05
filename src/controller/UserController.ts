@@ -1,8 +1,7 @@
 import { UserResponseDTO } from "../domain/DTO/UserResponse";
 import User from "../domain/entity/User";
 import { BadRequestError } from "../error_handler/BadRequestHandler";
-
-import { CryptoRSA } from "../services/CryptoRSA";
+import { CryptoAES } from "../services/CryptoAES";
 
 export class UserController {
 
@@ -18,7 +17,7 @@ export class UserController {
 
         try {
 
-            const encryptedData = new CryptoRSA().cryptoData({
+            const encryptedData = new CryptoAES().cryptoData({
                 name: req.body.name,
                 password: req.body.password,
                 documentNumber: req.body.documentNumber,
@@ -28,7 +27,7 @@ export class UserController {
 
             const user = new User(encryptedData);
     
-            // await user.save();
+            await user.save();
 
             res.status(201).send(new UserResponseDTO(user));
 

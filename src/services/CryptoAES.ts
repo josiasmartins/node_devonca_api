@@ -7,8 +7,11 @@ export class CryptoAES {
     private iv: Buffer;
 
     constructor() {
-        this.key = crypto.randomBytes(32); // 256 bits para AES-256
-        this.iv = crypto.randomBytes(16); // 128 bits para AES
+        // this.key = crypto.randomBytes(32); // 256 bits para AES-256
+        // this.iv = crypto.randomBytes(16); // 128 bits para AES
+
+        this.key = Buffer.from("i_like_in_the_end_and_more_music"); // Exemplo de 32 bytes
+        this.iv = Buffer.from("i_lik_in_the_end"); // Exemplo de 16 bytes
     }
 
     public encrypt(text: string): string {
@@ -25,20 +28,21 @@ export class CryptoAES {
         return decrypted;
     }
 
-    // private readonly ALG_AES_256_CTR = "aes-256-ctr";
+    public cryptoData(data: any) {
 
-    // encrypt(message: string): string {
-    //     const iv = crypto.randomBytes(16);
-    //     const crypted = crypto.createCipheriv(this.ALG_AES_256_CTR, "teste", iv).update(message, "utf-8", "base64");
-    //     console.log(crypted, " ibag crypted")
-    //     return crypted;
-    // }
+        let objeto = {};
 
-    // decrypt(message: string) {
-    //     const iv = crypto.randomBytes(16);
-    //     const decrypted = crypto.createDecipheriv(this.ALG_AES_256_CTR, "teste", iv).update(message, 'base64', 'utf-8');
-    //     console.log(decrypted, " ibag decrypted")
-    //     return decrypted;
-    // }
+        for (let field in data) {
+            const nameField = field;
+            const fieldValue = data[field];
+
+            const encryptedValue = this.encrypt(fieldValue);
+            objeto[field] = encryptedValue;
+        }
+
+        return objeto;
+
+    }
+
 
 }
