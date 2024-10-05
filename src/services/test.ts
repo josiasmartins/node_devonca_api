@@ -12,18 +12,22 @@ let publicKey = new NodeRSA(key_public);
 
 let secret = "hello word";
 
-function encrypt() {
+function encrypt(message) {
     // console.log(`KEYS ${fs.readFileSync('/c/Users/josias.m.caitano/Documents/keys/private.pem', 'utf8')}`);
-    let encrypted = publicKey.encrypt(secret, 'base64');
+    let encrypted = publicKey.encrypt(message, 'base64');
     console.log(encrypted, " IBAG CRYPTO");
+    return encrypted;
 }
 
-function decrypt() {
-    let decrypted = privateKey.decrypt('VVzmQMKhS02J6Y7NiySScIH6z60LkKT27WyIudQGc3l3WWNwbXD+YIgOef20E57KECEy0DWWXfrqjgbQrSt9NAo2CBjJ2m2O4hDqYCjQEu3k/QZ1S/oks8WEIny33ZDOCTLB4ob59pcDGO18epNG6ckugNrkkbp10PVDDJqw1tPFapI4MWLEohTAWXTv6EY69YhfIlYzc4k6d/MPw+rRCDL85XxgwHMLZBOA/tGhnyuIKHjj6qK55tdurCGnu9com7FysLVye6r3PyTrnZhAzEsVFtWt0ojPxhQsxuAudIsHwgY4x9tbrMurfHRgkQ41yBf4za/5OTcdkIMhwj80dg==');
-    console.log(decrypted + " IBAG DECRYPTED")
+function decrypt(message) {
+    let decrypted = privateKey.decrypt(message);
+    console.log(decrypted + " IBAG DECRYPTED");
+    return decrypted;
 }
 
+export { encrypt, decrypt };
 
-encrypt();
 
-decrypt();
+// encrypt();
+
+// decrypt();

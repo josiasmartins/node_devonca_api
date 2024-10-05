@@ -31,6 +31,10 @@ export class CryptoRSA {
 
     public decrypt(messageSecret: string): string {
         const decrypted = this.privateKey.decrypt(messageSecret);
+        if (Buffer.isBuffer(decrypted)) {
+            console.log(decrypted.toString(), "ibag IS_BUFEER")
+            return decrypted.toString(); // Converte o buffer para string
+        }
         console.log(decrypted, " ibag DECRYPTED VALUE");
         return decrypted;
     }
