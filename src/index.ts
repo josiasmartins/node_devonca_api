@@ -1,20 +1,13 @@
-import express from "express";
-import routes from "./routes";
 import "dotenv/config";
+import cors from "cors";
+import express from "express";
+
 import DatabaseInit from "./config/Database";
+import routes from "./routes";
 import { errorHandler } from "./middlewares/ErrorHandler";
 import { CryptoRSA } from "./services/CryptoRsa";
-import cors from "cors";
 
-import { decrypt, encrypt } from "./services/test";
-
-// console.log(decrypt(encrypt('jessica valeska')));
-
-
-
-// import "./services/test"
 const cryptoRSA = new CryptoRSA();
-// const encryptedValue = cryptoRSA.encrypt("hello word");
 cryptoRSA.decrypt(cryptoRSA.encrypt(null));
 
 const port = process.env.PORT || 3000;
