@@ -8,25 +8,15 @@ export function errorHandler(
     res: Response, 
     next: NextFunction) {
 
-    // if (res.headersSent) {
-    //     return next(err);
-    // }
-
     const statusCode = err.statusCode ?? 500;
     const message = err.message ?? "Internal Server Error";
     
     res.status(statusCode);
-    res.json({ name: err.name, message, statusCode, trace: err.stack  });
-    
-    // if (res.headersSent) {
-    //     return next(err);
-    // }
+    res.json({ name: err.name, message, statusCode, trace: err.stack });
 
-    // res.status(500);
-    // res.send(new ErrorModel(
-    //     err.name,
-    //     500,
-    //     err.message
-    // ));
+    console.error(`[ERROR_HANDLER] - CALL ERROR_HANDLER: ${JSON.stringify({ 
+        name: err.name, 
+        message, 
+        statusCode })}`);
 
 }

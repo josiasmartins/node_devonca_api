@@ -4,11 +4,17 @@ import "dotenv/config";
 import DatabaseInit from "./config/Database";
 import { errorHandler } from "./middlewares/ErrorHandler";
 import { CryptoRSA } from "./services/CryptoRsa";
+import cors from "cors";
 
-new CryptoRSA().encrypt();
+// import "./services/test"
+const cryptoRSA = new CryptoRSA();
+const encryptedValue = cryptoRSA.encrypt("hello word");
+cryptoRSA.decrypt(encryptedValue);
 
 const port = process.env.PORT || 3000;
 const app = express();
+
+app.use(cors())
 
 app.use(express.json());
 

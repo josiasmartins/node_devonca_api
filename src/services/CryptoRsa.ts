@@ -1,26 +1,38 @@
 import fs from "fs";
-import { NodeRSA } from "node-rsa";
+import path from "path";
+import NodeRSA from "node-rsa";
 
+/**
+ *  Class for cryptography asimetric (RSA) in node, used lib node-rsa;
+ */
 export class CryptoRSA {
 
-    private privateKey: NodeRSA;
-    private publicKey: NodeRSA;
-    secret = "hello";
+    private privateKey;
+    private publicKey;
 
     constructor() {
-        this.privateKey = new NodeRSA(fs.readFileSync('/c/Users/josias.m.caitano/Documents/keys/private.pem', 'utf8'));
-        this.publicKey = new NodeRSA(fs.readFileSync('/c/Users/josias.m.caitano/Documents/keys/private.pem', 'utf8'));
+        try {
+            let key_private = fs.readFileSync("../../../keys/private.pem", 'utf8');
+            let key_public = fs.readFileSync("../../../keys/public.pem", 'utf8');
+
+            this.privateKey = new NodeRSA(key_private);
+            this.publicKey = new NodeRSA(key_public);
+        } catch (error) {
+            console.log(error);
+        }
     }
     
-    public encrypt(secret?: string) {
-        console.log(`KEYS ${fs.readFileSync('/c/Users/josias.m.caitano/Documents/keys/private.pem', 'utf8')}`);
-        let encrypted = this.publicKey.encrypt(this.secret, 'base64');
+    public encrypt(messageSecret: string | number | boolean): string {
+
+        const encrypted = this.publicKey.encrypt(messageSecret, 'base64');
         console.log(encrypted);
+        return encrypted;
     }
 
-    public decrypt() {
-        const decrypted = this.privateKey.decrypt(this.secret);
-        console.log(decrypted);
+    public decrypt(messageSecret: string): string {
+        const decrypted = this.privateKey.decrypt(messageSecret);
+        console.log(decrypted, " ibag DECRYPTED VALUE");
+        return decrypted;
     }
 
 }

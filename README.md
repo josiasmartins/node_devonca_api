@@ -1,5 +1,8 @@
 ## Passos runner projeto
 
+## Cryptografia
+Estamos usando node-rsa para cryptografia asimetrica;
+
 ## Criacao do projeto
 npm init;
 
