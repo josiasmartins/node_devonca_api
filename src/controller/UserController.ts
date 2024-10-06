@@ -39,6 +39,8 @@ export class UserController {
                 image_profile: req.body.image_profile,
                 birthday: req.body.birthday
             });
+
+            // user.validate({ documentNumber: {} });
     
             await user.save();
 

@@ -6,7 +6,6 @@ import multer from 'multer';
 
 const upload = multer({ storage: multer.memoryStorage() }); // Armazenar na memória
 
-
 const routes = Router();
 
 routes.get("/user/", new UserController().getAll);

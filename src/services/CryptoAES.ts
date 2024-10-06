@@ -19,6 +19,12 @@ export class CryptoAES {
     }
 
     public encrypt(text: string | number | boolean): string {
+
+        if (this.isBase64(String(text))) {
+            console.log(`campo já crypted`);
+            return String(text);
+        }
+
         const cipher = crypto.createCipheriv('aes-256-cbc', this.key, this.iv);
         const encrypted = Buffer.concat([cipher.update(String(text), 'utf8'), cipher.final()]).toString('base64');
         console.log(encrypted, " ibag encrypted")
@@ -26,6 +32,11 @@ export class CryptoAES {
     }
 
     public decrypt(encryptedText: string): string {
+        if (!this.isBase64(encryptedText)) {
+            console.log(`campo já decrypted`);
+            return encryptedText;
+        }
+
         const decipher = crypto.createDecipheriv('aes-256-cbc', this.key, this.iv);
         const decrypted = Buffer.concat([decipher.update(Buffer.from(encryptedText, 'base64')), decipher.final()]).toString('utf8');
         console.log(decrypted, " ibag decryted")
@@ -60,6 +71,12 @@ export class CryptoAES {
         return data;
     }
     
+    // Função para verificar se uma string é Base64
+    private isBase64(str: string): boolean {
+        // Expressão regular para verificar se uma string está no formato Base64
+        const base64Regex = /^(?:[A-Z0-9+\/]{4})*(?:[A-Z0-9+\/]{2}==|[A-Z0-9+\/]{3}=)?$/i; // Início da string, zero ou mais grupos de 4 caracteres (A-Z, 0-9, +, /), opcionalmente terminando com padding '==' ou '=', fim da string (case-insensitive)
+        return base64Regex.test(str); // Retorna true se a string corresponder ao formato Base64
+    }
 
 
 }
