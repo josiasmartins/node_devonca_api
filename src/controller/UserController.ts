@@ -1,25 +1,41 @@
 import { UserResponseDTO } from "../domain/DTO/UserResponse";
 import User from "../domain/entity/User";
 import { BadRequestError } from "../error_handler/BadRequestHandler";
+import { CryptoAES } from "../services/CryptoAES";
+import { CryptoEnum } from "../services/CryptoEnum";
 
 export class UserController {
 
+    private cryptoAES: CryptoAES;
+
+    constructor() {
+        this.cryptoAES = new CryptoAES();
+    }
+
     async createUser(req, res, next) {
-
-        const _user = await User.findOne({ 'documentNumber': req.body.documentNumber});
-
-        console.log(_user, " ibag _user");
-
-        if (_user) {
-            next(new BadRequestError("documentNumber já salvo"));
-        }
-
+        // new CryptoAES().cryptoData({                name: req.body.name,
+        //     password: req.body.password,
+        //     documentNumber: req.body.documentNumber,
+        //     image_profile: req.body.image_profile,
+        //     birthday: req.body.birthday}, CryptoEnum.DECRYPT);
         try {
 
+            // const _user = await User.findOne({ 'documentNumber': this.cryptoAES.decrypt(req.body.documentNumber)});
+            const _user = await User.findOne({ 'documentNumber': req.body.documentNumber});
+
+            console.log(_user, " ibag _user");
+    
+            if (_user) {
+                new BadRequestError("documentNumber já salvo");
+            }
+
+            const encrypted = this.cryptoAES.cryptoData({ data: "test", nome: "jogos", objeto: { nome: "test" } }, CryptoEnum.ENCRYPT, ["nome"]);
+            console.log(encrypted, " IBAG ENCRYPTED")
+    
             const user = new User({
                 name: req.body.name,
-                password: req.body.password,
-                documentNumber: req.body.documentNumber,
+                password: this.cryptoAES.encrypt(req.body.password),
+                documentNumber: this.cryptoAES.encrypt(req.body.documentNumber),
                 image_profile: req.body.image_profile,
                 birthday: req.body.birthday
             });

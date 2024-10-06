@@ -10,7 +10,7 @@ const upload = multer({ storage: multer.memoryStorage() }); // Armazenar na mem√
 const routes = Router();
 
 routes.get("/user/", new UserController().getAll);
-routes.post("/user/", new UserController().createUser);
+routes.post("/user/", new UserController().createUser.bind(new UserController()));
 routes.put("/user/:id", new UserController().updateUser);
 routes.delete("/user/:id", new UserController().deleteUser);
 

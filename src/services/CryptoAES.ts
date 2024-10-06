@@ -32,31 +32,26 @@ export class CryptoAES {
         return decrypted;
     }
 
-    public cryptoAll(data: any) {
-        let encryptedData = {};
-
-        for (let fieldName in data) {
-            const fieldValue = data[fieldName];
-            encryptedData[fieldName] = fieldValue; 
-        }
-
-        return encryptedData;
-
-    }
-
-    public cryptoData(data: any, crypto: CryptoEnum) {
+    public cryptoData(data: any, crypto: CryptoEnum, ignoreFields?: string[]) {
         // Verifica se o dado é um objeto e não é nulo
         if (typeof data === 'object' && data !== null) {
             // Percorre cada chave no objeto
             for (let key in data) {
                 const fieldValue = data[key];
+
+                // Verifica se o campo atual deve ser excluído
+                if (ignoreFields.includes(key)) {
+                    continue;  // Ignora a criptografia para este campo
+                }
+
                 // Verifica se o valor da chave é uma string, um número ou booleano
                 if (typeof fieldValue === 'string' || typeof fieldValue === 'number' || typeof fieldValue === 'boolean') {
+
                     // cryptografa o valor
                     data[key] = crypto === CryptoEnum.ENCRYPT ? this.encrypt(fieldValue)  : this.decrypt(String(fieldValue));
                 } else {
                     // Se o valor é um objeto ou array, chama a função recursivamente
-                    this.cryptoData(data[key], crypto);
+                    this.cryptoData(data[key], crypto, ignoreFields);
                 }
             }
         }
