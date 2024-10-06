@@ -69,4 +69,16 @@ export class UserController {
         return res.status(201).send(user);
     } 
 
+    async deleteAll(req, res, next) {
+
+        try {
+            const user = await User.deleteMany();
+
+            res.status(200).send({ message: `${user.deletedCount} users deleted.` });
+
+        } catch (err) {
+            next(err);
+        }
+    }
+
 }
