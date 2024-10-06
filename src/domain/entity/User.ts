@@ -1,8 +1,9 @@
 import mongoose, { Schema } from "mongoose";
 import { CryptoAES } from "../../services/CryptoAES";
 import { CryptoEnum } from "../../services/CryptoEnum";
+import { IUser } from "../interfaces/IUser";
 
-const UserSchema = new Schema({
+const UserSchema = new Schema<IUser>({
     name: { type: String, required: true },
     password: { type: String, required: true, minLength: 4, maxLength: 14 },
     documentNumber: { type: String, required: true, match: /\d+$/ },

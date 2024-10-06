@@ -13,41 +13,31 @@ export class UserController {
     }
 
     async createUser(req, res, next) {
-        // new CryptoAES().cryptoData({                name: req.body.name,
-        //     password: req.body.password,
-        //     documentNumber: req.body.documentNumber,
-        //     image_profile: req.body.image_profile,
-        //     birthday: req.body.birthday}, CryptoEnum.DECRYPT);
+
         try {
 
-            // const _user = await User.findOne({ 'documentNumber': this.cryptoAES.decrypt(req.body.documentNumber)});
             const _user = await User.findOne({ 'documentNumber': req.body.documentNumber});
-
             console.log(_user, " ibag _user");
-    
             if (_user) {
                 new BadRequestError("documentNumber já salvo");
             }
-
-            const encrypted = this.cryptoAES.cryptoData({ data: "test", nome: "jogos", objeto: { nome: "test" } }, CryptoEnum.ENCRYPT, ["nome"]);
-            console.log(encrypted, " IBAG ENCRYPTED")
     
             const user = new User({
                 name: req.body.name,
-                password: this.cryptoAES.encrypt(req.body.password),
-                documentNumber: this.cryptoAES.encrypt(req.body.documentNumber),
+                password: req.body.password,
+                documentNumber: req.body.documentNumber,
                 image_profile: req.body.image_profile,
                 birthday: req.body.birthday
             });
-
-            // user.validate({ documentNumber: {} });
     
             await user.save();
 
-            res.status(201).send(new UserResponseDTO(user));
+            const cryptedData = this.cryptoAES.cryptoData(user.toObject(), CryptoEnum.ENCRYPT, ["_id", "_iv"]);
+            console.log(cryptedData, " ibag cryptedData");
+
+            res.status(201).send(new UserResponseDTO(cryptedData));
 
         } catch (error) {
-            // throw new BadRequestError("Campo invalido");
             next(error)
         }
 

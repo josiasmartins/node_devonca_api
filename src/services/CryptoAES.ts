@@ -43,7 +43,7 @@ export class CryptoAES {
         return decrypted;
     }
 
-    public cryptoData(data: any, crypto: CryptoEnum, ignoreFields?: string[]) {
+    public cryptoData(data: any, crypto: CryptoEnum, ignoreFields: string[] = []) {
         // Verifica se o dado é um objeto e não é nulo
         if (typeof data === 'object' && data !== null) {
             // Percorre cada chave no objeto
