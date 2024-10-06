@@ -6,13 +6,13 @@ import multer from 'multer';
 
 const upload = multer({ storage: multer.memoryStorage() }); // Armazenar na memória
 
-
 const routes = Router();
 
 routes.get("/user/", new UserController().getAll);
-routes.post("/user/", new UserController().createUser);
+routes.post("/user/", new UserController().createUser.bind(new UserController()));
 routes.put("/user/:id", new UserController().updateUser);
-routes.delete("/user/:id", new UserController().deleteUser);
+routes.delete("/user/delete/:id", new UserController().deleteUser);
+routes.delete("/user/delete_all", new UserController().deleteAll);
 
 /** COURSE_VIDEO */
 routes.post("/course_video/upload", upload.single('file'), new CourseVideoController().uploadCourse);

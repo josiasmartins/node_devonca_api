@@ -213,10 +213,12 @@ export class CourseVideoController {
 
     async deleteAll(req, res: Response, next) {
 
-        const courseVideo = await CourseVideo.deleteMany({});
-        res.status(200);
-
-        res.send(courseVideo);
+        try {
+            const courseVideo = await CourseVideo.deleteMany({});
+            res.status(200).send({ message: `${courseVideo.deletedCount} videos deleted.` });
+        } catch (error) {
+            next(error);
+        }
 
     }
 
