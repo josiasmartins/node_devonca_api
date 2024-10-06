@@ -5,7 +5,6 @@ import { NextFunction, Request, Response } from 'express';
 import CourseVideo from '../domain/entity/CourseVideo';
 import { BadRequestError } from '../error_handler/BadRequestHandler';
 import mongoose from 'mongoose';
-import path from "path";
 import { NotFoundError } from '../error_handler/NotFoundError';
 
 // Configura o caminho do FFmpeg
@@ -51,6 +50,7 @@ export class CourseVideoController {
     
             // Compressão se o vídeo exceder o tamanho máximo
             if (videoBuffer.length > MAX_SIZE) {
+                fs.mkdirSync('uploads')
                 const tempInputPath = `uploads/temp_${originalname}`;
                 const tempOutputPath = `uploads/compressed_${originalname}`;
     
@@ -77,6 +77,8 @@ export class CourseVideoController {
                 // Remove arquivos temporários
                 fs.unlinkSync(tempInputPath);
                 fs.unlinkSync(tempOutputPath);
+                fs.rmdir("uploads", () => {});
+
             }
     
             // Calcular quantos pedaços criar com base no buffer (comprimido ou original)
@@ -209,6 +211,38 @@ export class CourseVideoController {
         }
     }
 
+    async deleteAll(req, res: Response, next) {
+
+        try {
+            const courseVideo = await CourseVideo.deleteMany({});
+            res.status(200).send({ message: `${courseVideo.deletedCount} videos deleted.` });
+        } catch (error) {
+            next(error);
+        }
+
+    }
+
+    async deleteByName(req: Request, res: Response, next: NextFunction) {
+
+        try {
+
+            const name = req.params.delete_by_name;
+            const existsCourseVideo = await CourseVideo.findOne({ filename: `${name}.part1` });
+
+            if (!existsCourseVideo) {
+                throw new NotFoundError("Not found video");
+            }
+
+            const courseVideo = await CourseVideo.deleteMany({ filename: new RegExp(`^${name}\\.part\\d+$`)});
+
+            res.status(200).json(courseVideo);
+
+        } catch (err) {
+            console.log(err);
+            next(err);
+        }
+
+    }
+
       
-    
 }

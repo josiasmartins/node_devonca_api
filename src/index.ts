@@ -1,9 +1,18 @@
-import express from "express";
-import routes from "./routes";
 import "dotenv/config";
-import DatabaseInit from "./config/Database";
-import { errorHandler } from "./middlewares/ErrorHandler";
 import cors from "cors";
+import express from "express";
+
+import DatabaseInit from "./config/Database";
+import routes from "./routes";
+import { errorHandler } from "./middlewares/ErrorHandler";
+import { CryptoRSA } from "./services/CryptoRSA";
+import { CryptoAES } from "./services/CryptoAES";
+
+const cryptoAES = new CryptoAES();
+console.log(cryptoAES.decrypt(cryptoAES.encrypt("i like in the end")));
+
+// const cryptoRSA = new CryptoRSA();
+// cryptoRSA.decrypt(cryptoRSA.encrypt("Devonca schools"));
 
 const port = process.env.PORT || 3000;
 const app = express();

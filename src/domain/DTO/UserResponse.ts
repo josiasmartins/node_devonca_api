@@ -1,4 +1,4 @@
-import User  from "../entity/User";
+import { IUser } from "../interfaces/IUser";
 
 export class UserResponseDTO {
 
@@ -8,8 +8,8 @@ export class UserResponseDTO {
     private image_profile: string;
     private birthday: string;
 
-    constructor(user: any) {
-        this.name = user.name;
+    constructor(user: IUser) {
+        this.name = user.name;  
         this.password = user.password;
         this.documentNumber = user.documentNumber;
         this.image_profile = user.image_profile;

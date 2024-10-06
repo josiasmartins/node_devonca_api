@@ -1,21 +1,27 @@
 import { UserResponseDTO } from "../domain/DTO/UserResponse";
 import User from "../domain/entity/User";
 import { BadRequestError } from "../error_handler/BadRequestHandler";
+import { CryptoAES } from "../services/CryptoAES";
+import { CryptoEnum } from "../services/CryptoEnum";
 
 export class UserController {
 
+    private cryptoAES: CryptoAES;
+
+    constructor() {
+        this.cryptoAES = new CryptoAES();
+    }
+
     async createUser(req, res, next) {
-
-        const _user = await User.findOne({ 'documentNumber': req.body.documentNumber});
-
-        console.log(_user, " ibag _user")
-
-        if (_user) {
-            next(new BadRequestError("documentNumber já salvo"));
-        }
 
         try {
 
+            const _user = await User.findOne({ 'documentNumber': req.body.documentNumber});
+            console.log(_user, " ibag _user");
+            if (_user) {
+                new BadRequestError("documentNumber já salvo");
+            }
+    
             const user = new User({
                 name: req.body.name,
                 password: req.body.password,
@@ -26,10 +32,12 @@ export class UserController {
     
             await user.save();
 
-            res.status(201).send(new UserResponseDTO(user));
+            const cryptedData = this.cryptoAES.cryptoData(user.toObject(), CryptoEnum.ENCRYPT, ["_id", "_iv"]);
+            console.log(cryptedData, " ibag cryptedData");
+
+            res.status(201).send(new UserResponseDTO(cryptedData));
 
         } catch (error) {
-            // throw new BadRequestError("Campo invalido");
             next(error)
         }
 
@@ -60,5 +68,17 @@ export class UserController {
             
         return res.status(201).send(user);
     } 
+
+    async deleteAll(req, res, next) {
+
+        try {
+            const user = await User.deleteMany();
+
+            res.status(200).send({ message: `${user.deletedCount} users deleted.` });
+
+        } catch (err) {
+            next(err);
+        }
+    }
 
 }
